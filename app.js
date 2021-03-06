@@ -22,6 +22,8 @@ const articleSchema = {
 
 const Article = mongoose.model("article", articleSchema);
 
+//////////requests targetting all articles/////////////////
+
 app.route("/articles")
 .get(function (req, res) {
   Article.find(function (err, foundArticles) {
@@ -49,6 +51,58 @@ app.route("/articles")
 
 .delete(function (req, res) {
   Article.deleteMany(function (err) {
+    if(!err){
+    res.send("Success in deleting");
+  } else {
+    res.send(err);
+  }
+});
+});
+
+/////////////requests targetting a specific article/////////////////
+
+app.route("/articles/:articleTitle")
+.get(function (req, res) {
+  Article.findOne({title : req.params.articleTitle}, function (err, foundArticle) {
+    if(!err){
+    res.send(foundArticle);
+  } else {
+    res.send("no articles matching that title.");
+  }
+});
+})
+//replaces whole article
+.put(function (req, res) {
+  Article.update(
+    {title : req.params.articleTitle},
+    {title: req.body.title, content: req.body.content},
+    {overwrite: true},
+    function (err) {
+      if(!err){
+      res.send(foundArticle);
+    } else {
+      res.send("failure in updation");
+    }
+  });
+})
+//replaces part of article
+.patch(function (req,res) {
+  Article.update(
+    {title : req.params.articleTitle},
+    {$set: req.body}, //automatically updates part of body which has been added by user
+    function (err) {
+      if(!err){
+      res.send("success");
+    } else {
+      res.send("failure in patching");
+    }
+  });
+})
+
+.delete(function (req, res) {
+  Article.deleteOne(
+    {title : req.params.articleTitle},
+    function (err) {
     if(!err){
     res.send("Success in deleting");
   } else {
