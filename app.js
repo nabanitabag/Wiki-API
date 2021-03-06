@@ -1,5 +1,4 @@
 //jshint esversion:6
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -23,10 +22,39 @@ const articleSchema = {
 
 const Article = mongoose.model("article", articleSchema);
 
-app.get("/articles", function (req, res) {
+app.route("/articles")
+.get(function (req, res) {
   Article.find(function (err, foundArticles) {
+    if(!err){
     res.send(foundArticles);
-  })
+  } else {
+    res.send(err);
+  }
+});
+})
+
+ .post(function (req, res) {
+   const newArticle = new Article({
+     title: req.body.title,
+     content: req.body.content
+   });
+   newArticle.save(function (err) {
+     if(!err){
+     res.send("Success in saving");
+   } else {
+     res.send(err);
+   }
+   });
+})
+
+.delete(function (req, res) {
+  Article.deleteMany(function (err) {
+    if(!err){
+    res.send("Success in deleting");
+  } else {
+    res.send(err);
+  }
+});
 });
 
 app.listen(3000, function() {
